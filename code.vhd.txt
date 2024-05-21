@@ -1,0 +1,38 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+entity CaesarCipher is
+    Port ( clk : in STD_LOGIC;
+           reset : in STD_LOGIC;
+           shift : in INTEGER range 0 to 25;
+           input_char : in STD_LOGIC_VECTOR(7 downto 0);
+           output_char : out STD_LOGIC_VECTOR(7 downto 0));
+end CaesarCipher;
+
+architecture Behavioral of CaesarCipher is
+begin
+    process(clk, reset)
+    variable char_ascii : integer range 0 to 255;
+    variable encrypted_ascii : integer range 0 to 255;
+    begin
+        if reset = '1' then
+            output_char <= (others => '0');
+        elsif rising_edge(clk) then
+            char_ascii := to_integer(unsigned(input_char));
+            
+            -- Check if input is uppercase letter
+            if char_ascii >= 65 and char_ascii <= 90 then
+                encrypted_ascii := ((char_ascii - 65) + shift) mod 26 + 65;
+            -- Check if input is lowercase letter
+            elsif char_ascii >= 97 and char_ascii <= 122 then
+                encrypted_ascii := ((char_ascii - 97) + shift) mod 26 + 97;
+            else
+                encrypted_ascii := char_ascii; -- Leave non-letter characters unchanged
+            end if;
+            
+            output_char <= std_logic_vector(to_unsigned(encrypted_ascii, 8));
+        end if;
+    end process;
+end Behavioral;
